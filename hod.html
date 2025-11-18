@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AutoAttend</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header i {
+            font-size: 1.8rem;
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-present {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-absent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+        }
+
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent);
+        }
+
+        /* Action buttons in tables */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+        }
+
+        .delete-btn {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent);
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            position: relative;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: 15px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-header i {
+            font-size: 3.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .login-header h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            transform: translateX(-3px);
+        }
+
+        /* Hidden sections */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .stat-schools .number { color: var(--secondary); }
+        .stat-teachers .number { color: var(--success); }
+        .stat-students .number { color: var(--warning); }
+        .stat-attendance .number { color: var(--accent); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-header h2, .menu-item span {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-school"></i>
+                <h2>AutoAttend</h2>
+                <p>Admin Login</p>
+            </div>
+            <button class="back-btn" onclick="window.location.href='home.html'" title="Back to Home">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user" style="margin-right: 8px;"></i>Username
+                    </label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter admin username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock" style="margin-right: 8px;"></i>Password
+                    </label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter admin password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 600;">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>Login to Admin Dashboard
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard (Hidden until login) -->
+    <div id="admin-dashboard" class="container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-school"></i>
+                <h2>AutoAttend</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-page="schools">
+                    <i class="fas fa-university"></i>
+                    <span>Manage Schools</span>
+                </div>
+                <div class="menu-item" data-page="teachers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Manage Teachers</span>
+                </div>
+                <div class="menu-item" data-page="students">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Students</span>
+                </div>
+                <div class="menu-item" data-page="attendance">
+                    <i class="fas fa-user-check"></i>
+                    <span>Attendance Reports</span>
+                </div>
+                <div class="menu-item" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="menu-item" data-page="sync">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Sync & Backup</span>
+                </div>
+                <div class="menu-item" data-page="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+                <div class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>System Settings</span>
+                </div>
+                <div class="menu-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1 id="page-title">Admin Dashboard</h1>
+                    <p id="current-date">Loading date...</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">AD</div>
+                    <div>
+                        <div>Administrator</div>
+                        <small>System Admin</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page-section active">
+                <div class="stats-grid">
+                    <div class="stat-card stat-schools">
+                        <div class="number">12</div>
+                        <div class="label">Schools</div>
+                    </div>
+                    <div class="stat-card stat-teachers">
+                        <div class="number">48</div>
+                        <div class="label">Teachers</div>
+                    </div>
+                    <div class="stat-card stat-students">
+                        <div class="number">1,250</div>
+                        <div class="label">Students</div>
+                    </div>
+                    <div class="stat-card stat-attendance">
+                        <div class="number">94%</div>
+                        <div class="label">Avg. Attendance</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h3>Manage Schools</h3>
+                        <p>View, add, or edit schools in the system.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="schools">
+                            <i class="fas fa-cog"></i> Manage Schools
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Manage Teachers</h3>
+                        <p>Add, edit, or deactivate teacher accounts.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="teachers">
+                            <i class="fas fa-user-edit"></i> Manage Teachers
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Manage Students</h3>
+                        <p>View, add, or edit student information.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="students">
+                            <i class="fas fa-user-graduate"></i> Manage Students
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>View Analytics</h3>
+                        <p>Check system-wide analytics and reports.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="analytics">
+                            <i class="fas fa-chart-line"></i> View Analytics
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Activity</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Activity</th>
+                                <th>User</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>10:25 AM</td>
+                                <td>Attendance Marked</td>
+                                <td>Teacher Smith (Class 5A)</td>
+                                <td>25 students, 92% attendance</td>
+                            </tr>
+                            <tr>
+                                <td>09:45 AM</td>
+                                <td>New Student Added</td>
+                                <td>Admin</td>
+                                <td>Rahul Sharma added to Class 5A</td>
+                            </tr>
+                            <tr>
+                                <td>Yesterday</td>
+                                <td>Teacher Account Created</td>
+                                <td>Admin</td>
+                                <td>Ms. Patel account created for Class 6B</td>
+                            </tr>
+                            <tr>
+                                <td>Yesterday</td>
+                                <td>Data Sync</td>
+                                <td>System</td>
+                                <td>All schools data synchronized</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Schools Management Page -->
+            <div id="schools" class="page-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>School Management</h3>
+                        <button class="btn" id="add-school-btn">
+                            <i class="fas fa-plus"></i> Add School
+                        </button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>School ID</th>
+                                <th>School Name</th>
+                                <th>Location</th>
+                                <th>Classes</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schools-list-body">
+                            <!-- Schools data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Teachers Management Page -->
+            <div id="teachers" class="page-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Teacher Management</h3>
+                        <button class="btn" id="add-teacher-btn">
+                            <i class="fas fa-plus"></i> Add Teacher
+                        </button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Teacher ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>School</th>
+                                <th>Class</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachers-list-body">
+                            <!-- Teachers data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Students Management Page -->
+            <div id="students" class="page-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Student Management</h3>
+                        <button class="btn" id="add-student-btn">
+                            <i class="fas fa-plus"></i> Add Student
+                        </button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>School</th>
+                                <th>Class</th>
+                                <th>Attendance %</th>
+                                <th>Last Attendance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list-body">
+                            <!-- Students data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Attendance Reports Page -->
+            <div id="attendance" class="page-section">
+                <div class="card">
+                    <h3>Attendance Reports</h3>
+                    <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+                        <select class="form-control" style="width: auto;">
+                            <option>Today</option>
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>This month</option>
+                            <option>Custom range</option>
+                        </select>
+                        <select class="form-control" style="width: auto;">
+                            <option>All Schools</option>
+                            <option>Rural School A</option>
+                            <option>Rural School B</option>
+                            <option>Rural School C</option>
+                        </select>
+                        <button class="btn">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top: 1.5rem;">
+                    <div class="table-header">
+                        <h3>Daily Attendance Summary</h3>
+                        <span class="badge badge-primary">Today</span>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>School</th>
+                                <th>Class</th>
+                                <th>Total Students</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-summary-body">
+                            <!-- Attendance summary will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics" class="page-section">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3>Attendance Trend</h3>
+                        <div style="height: 300px; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            [Attendance Chart Would Appear Here]
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Summary</h3>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Total Schools</span>
+                                <strong>12</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Average Attendance</span>
+                                <strong>94%</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Most Absent School</span>
+                                <strong>Rural School C (87%)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0;">
+                                <span>Best Attendance</span>
+                                <strong>Rural School A (98%)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>School Performance</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>School</th>
+                                <th>Classes</th>
+                                <th>Students</th>
+                                <th>Avg. Attendance</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Rural School A</td>
+                                <td>8</td>
+                                <td>240</td>
+                                <td>98%</td>
+                                <td><span class="badge badge-success">+2%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Rural School B</td>
+                                <td>6</td>
+                                <td>180</td>
+                                <td>95%</td>
+                                <td><span class="badge badge-success">+1%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Rural School C</td>
+                                <td>5</td>
+                                <td>150</td>
+                                <td>87%</td>
+                                <td><span class="badge badge-danger">-3%</span></td>
+                            </tr>
+                            <!-- More rows would be here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sync & Backup Page -->
+            <div id="sync" class="page-section">
+                <div class="card">
+                    <h3>Data Synchronization & Backup</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Upload Data</h3>
+                            <p>Send all attendance records to the central server.</p>
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                    <span style="flex: 1;">Pending records:</span>
+                                    <span class="badge badge-warning">42</span>
+                                </div>
+                                <button class="btn btn-warning" style="width: 100%;">
+                                    <i class="fas fa-upload"></i> Upload All Data
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3>Backup Database</h3>
+                            <p>Create a backup of the entire system database.</p>
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                    <span style="flex: 1;">Last backup:</span>
+                                    <span>2 days ago</span>
+                                </div>
+                                <button class="btn" style="width: 100%;">
+                                    <i class="fas fa-save"></i> Create Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3>Sync History</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Records</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15 Nov 2023, 10:30 AM</td>
+                                    <td>Upload</td>
+                                    <td>125 records</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14 Nov 2023, 4:15 PM</td>
+                                    <td>Backup</td>
+                                    <td>Full system</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>13 Nov 2023, 9:45 AM</td>
+                                    <td>Upload</td>
+                                    <td>89 records</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Page -->
+            <div id="notifications" class="page-section">
+                <div class="card">
+                    <h3>Send Notifications</h3>
+                    <form id="notification-form">
+                        <div class="form-group">
+                            <label class="form-label">Recipients</label>
+                            <select class="form-control" multiple style="height: 120px;">
+                                <option>All Schools</option>
+                                <option>Rural School A</option>
+                                <option>Rural School B</option>
+                                <option>Rural School C</option>
+                                <option>All Teachers</option>
+                                <option>Specific Teachers...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="form-control" placeholder="Enter notification subject">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" rows="5" placeholder="Enter your notification message"></textarea>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Send Notification
+                            </button>
+                            <button type="button" class="btn btn-outline">
+                                <i class="fas fa-save"></i> Save as Draft
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>Notification History</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Recipients</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>14 Nov 2023</td>
+                                <td>Low Attendance Alert</td>
+                                <td>Rural School C</td>
+                                <td><span class="badge badge-success">Sent</span></td>
+                            </tr>
+                            <tr>
+                                <td>12 Nov 2023</td>
+                                <td>System Maintenance</td>
+                                <td>All Schools</td>
+                                <td><span class="badge badge-success">Sent</span></td>
+                            </tr>
+                            <tr>
+                                <td>10 Nov 2023</td>
+                                <td>New Feature Update</td>
+                                <td>All Teachers</td>
+                                <td><span class="badge badge-success">Sent</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page-section">
+                <div class="card">
+                    <h3>System Settings</h3>
+                    
+                    <div style="display: grid; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Default Attendance Method</label>
+                            <select class="form-control">
+                                <option>Face Recognition</option>
+                                <option>QR Code</option>
+                                <option>RFID</option>
+                                <option>Manual</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Auto Backup</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Automatically backup database daily</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Low Attendance Alerts</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Send alerts when attendance drops below threshold</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Teacher Registration</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Allow teachers to register themselves</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-undo"></i> Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for demonstration
+        const sampleSchools = [
+            { id: 'SCH001', name: 'Rural School A', location: 'Village A', classes: 8, students: 240, status: 'active' },
+            { id: 'SCH002', name: 'Rural School B', location: 'Village B', classes: 6, students: 180, status: 'active' },
+            { id: 'SCH003', name: 'Rural School C', location: 'Village C', classes: 5, students: 150, status: 'active' },
+            { id: 'SCH004', name: 'Rural School D', location: 'Village D', classes: 7, students: 210, status: 'inactive' }
+        ];
+
+        const sampleTeachers = [
+            { id: 'T001', name: 'Teacher Smith', email: 'smith@schoola.edu', school: 'Rural School A', class: '5A', lastLogin: '15 Nov 2023', status: 'active' },
+            { id: 'T002', name: 'Ms. Patel', email: 'patel@schoola.edu', school: 'Rural School A', class: '6B', lastLogin: '14 Nov 2023', status: 'active' },
+            { id: 'T003', name: 'Mr. Johnson', email: 'johnson@schoolb.edu', school: 'Rural School B', class: '4A', lastLogin: '15 Nov 2023', status: 'active' },
+            { id: 'T004', name: 'Mrs. Williams', email: 'williams@schoolc.edu', school: 'Rural School C', class: '5C', lastLogin: '13 Nov 2023', status: 'inactive' }
+        ];
+
+        const sampleStudents = [
+            { id: 'S001', name: 'Rahul Sharma', school: 'Rural School A', class: '5A', attendance: 95, lastAttendance: '15 Nov 2023' },
+            { id: 'S002', name: 'Priya Patel', school: 'Rural School A', class: '5A', attendance: 98, lastAttendance: '15 Nov 2023' },
+            { id: 'S003', name: 'Amit Kumar', school: 'Rural School A', class: '5A', attendance: 87, lastAttendance: '15 Nov 2023' },
+            { id: 'S004', name: 'Sneha Singh', school: 'Rural School B', class: '4A', attendance: 92, lastAttendance: '15 Nov 2023' },
+            { id: 'S005', name: 'Vikram Joshi', school: 'Rural School B', class: '4A', attendance: 96, lastAttendance: '15 Nov 2023' }
+        ];
+
+        const sampleAttendanceSummary = [
+            { school: 'Rural School A', class: '5A', total: 25, present: 23, absent: 2, percentage: 92 },
+            { school: 'Rural School A', class: '6B', total: 30, present: 29, absent: 1, percentage: 97 },
+            { school: 'Rural School B', class: '4A', total: 28, present: 26, absent: 2, percentage: 93 },
+            { school: 'Rural School C', class: '5C', total: 22, present: 18, absent: 4, percentage: 82 }
+        ];
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const pageSections = document.querySelectorAll('.page-section');
+        const pageTitle = document.getElementById('page-title');
+        const currentDate = document.getElementById('current-date');
+        const schoolsListBody = document.getElementById('schools-list-body');
+        const teachersListBody = document.getElementById('teachers-list-body');
+        const studentsListBody = document.getElementById('students-list-body');
+        const attendanceSummaryBody = document.getElementById('attendance-summary-body');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Set current date
+        const now = new Date();
+        currentDate.textContent = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Security variables
+        let failedAttempts = 0;
+        let lockoutTime = null;
+        const maxAttempts = 3;
+        const lockoutDuration = 60000; // 1 minute in milliseconds
+        
+        // Correct credentials
+        const correctUsername = 'hodadmin';
+        const correctPassword = 'HOD@2024';
+
+        // Login functionality with security
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Check if account is locked
+            if (lockoutTime && Date.now() < lockoutTime) {
+                const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000);
+                alert(`Account is locked. Please try again in ${remainingTime} seconds.`);
+                return;
+            }
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Validate credentials
+            if (username === correctUsername && password === correctPassword) {
+                // Reset failed attempts on successful login
+                failedAttempts = 0;
+                lockoutTime = null;
+                
+                loginPage.style.display = 'none';
+                adminDashboard.style.display = 'flex';
+                populateAllTables();
+            } else {
+                failedAttempts++;
+                
+                if (failedAttempts >= maxAttempts) {
+                    lockoutTime = Date.now() + lockoutDuration;
+                    alert(`Too many failed attempts. Account locked for 1 minute.`);
+                    
+                    // Clear form
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    const remainingAttempts = maxAttempts - failedAttempts;
+                    alert(`Invalid username or password. ${remainingAttempts} attempt(s) remaining.`);
+                }
+            }
+        });
+
+        // Navigation
+        menuItems.forEach(item => {
+            if (item.id !== 'logout-btn') {
+                item.addEventListener('click', function() {
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Update active menu item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target page
+                    pageSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(targetPage).classList.add('active');
+                    
+                    // Update page title
+                    pageTitle.textContent = getPageTitle(targetPage);
+                });
+            }
+        });
+
+        // Button navigation
+        document.querySelectorAll('button[data-page]').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetPage = this.getAttribute('data-page');
+                
+                // Update active menu item
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector(`.menu-item[data-page="${targetPage}"]`).classList.add('active');
+                
+                // Show target page
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById(targetPage).classList.add('active');
+                
+                // Update page title
+                pageTitle.textContent = getPageTitle(targetPage);
+            });
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                adminDashboard.style.display = 'none';
+                loginPage.style.display = 'flex';
+                loginForm.reset();
+            }
+        });
+
+        // Helper functions
+        function getPageTitle(page) {
+            const titles = {
+                'dashboard': 'Admin Dashboard',
+                'schools': 'Manage Schools',
+                'teachers': 'Manage Teachers',
+                'students': 'Manage Students',
+                'attendance': 'Attendance Reports',
+                'analytics': 'Analytics',
+                'sync': 'Sync & Backup',
+                'notifications': 'Notifications',
+                'settings': 'System Settings'
+            };
+            return titles[page] || 'AutoAttend Admin';
+        }
+
+        function populateAllTables() {
+            populateSchoolsTable();
+            populateTeachersTable();
+            populateStudentsTable();
+            populateAttendanceSummaryTable();
+        }
+
+        function populateSchoolsTable() {
+            schoolsListBody.innerHTML = '';
+            sampleSchools.forEach(school => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${school.id}</td>
+                    <td>${school.name}</td>
+                    <td>${school.location}</td>
+                    <td>${school.classes}</td>
+                    <td>${school.students}</td>
+                    <td><span class="badge ${school.status === 'active' ? 'badge-success' : 'badge-danger'}">${school.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editSchool('${school.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteSchool('${school.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                schoolsListBody.appendChild(row);
+            });
+        }
+
+        function populateTeachersTable() {
+            teachersListBody.innerHTML = '';
+            sampleTeachers.forEach(teacher => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${teacher.id}</td>
+                    <td>${teacher.name}</td>
+                    <td>${teacher.email}</td>
+                    <td>${teacher.school}</td>
+                    <td>${teacher.class}</td>
+                    <td>${teacher.lastLogin}</td>
+                    <td><span class="badge ${teacher.status === 'active' ? 'badge-success' : 'badge-danger'}">${teacher.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editTeacher('${teacher.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteTeacher('${teacher.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                teachersListBody.appendChild(row);
+            });
+        }
+
+        function populateStudentsTable() {
+            studentsListBody.innerHTML = '';
+            sampleStudents.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.school}</td>
+                    <td>${student.class}</td>
+                    <td>${student.attendance}%</td>
+                    <td>${student.lastAttendance}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editStudent('${student.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteStudent('${student.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                studentsListBody.appendChild(row);
+            });
+        }
+
+        function populateAttendanceSummaryTable() {
+            attendanceSummaryBody.innerHTML = '';
+            sampleAttendanceSummary.forEach(summary => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${summary.school}</td>
+                    <td>${summary.class}</td>
+                    <td>${summary.total}</td>
+                    <td>${summary.present}</td>
+                    <td>${summary.absent}</td>
+                    <td>${summary.percentage}%</td>
+                `;
+                attendanceSummaryBody.appendChild(row);
+            });
+        }
+
+        // Management Functions
+        function editStudent(studentId) {
+            const student = sampleStudents.find(s => s.id === studentId);
+            if (student) {
+                const newName = prompt('Edit student name:', student.name);
+                if (newName && newName.trim()) {
+                    student.name = newName.trim();
+                    populateStudentsTable();
+                    alert('Student updated successfully!');
+                }
+            }
+        }
+
+        function deleteStudent(studentId) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                const index = sampleStudents.findIndex(s => s.id === studentId);
+                if (index > -1) {
+                    sampleStudents.splice(index, 1);
+                    populateStudentsTable();
+                    alert('Student deleted successfully!');
+                }
+            }
+        }
+
+        function editTeacher(teacherId) {
+            const teacher = sampleTeachers.find(t => t.id === teacherId);
+            if (teacher) {
+                const newName = prompt('Edit teacher name:', teacher.name);
+                if (newName && newName.trim()) {
+                    teacher.name = newName.trim();
+                    populateTeachersTable();
+                    alert('Teacher updated successfully!');
+                }
+            }
+        }
+
+        function deleteTeacher(teacherId) {
+            if (confirm('Are you sure you want to delete this teacher?')) {
+                const index = sampleTeachers.findIndex(t => t.id === teacherId);
+                if (index > -1) {
+                    sampleTeachers.splice(index, 1);
+                    populateTeachersTable();
+                    alert('Teacher deleted successfully!');
+                }
+            }
+        }
+
+        function editSchool(schoolId) {
+            const school = sampleSchools.find(s => s.id === schoolId);
+            if (school) {
+                const newName = prompt('Edit school name:', school.name);
+                if (newName && newName.trim()) {
+                    school.name = newName.trim();
+                    populateSchoolsTable();
+                    alert('School updated successfully!');
+                }
+            }
+        }
+
+        function deleteSchool(schoolId) {
+            if (confirm('Are you sure you want to delete this school?')) {
+                const index = sampleSchools.findIndex(s => s.id === schoolId);
+                if (index > -1) {
+                    sampleSchools.splice(index, 1);
+                    populateSchoolsTable();
+                    alert('School deleted successfully!');
+                }
+            }
+        }
+
+        // Export Report Function
+        function exportAttendanceReport() {
+            const reportData = [
+                ['School', 'Class', 'Total Students', 'Present', 'Absent', 'Attendance %'],
+                ['Rural School A', '5A', '25', '23', '2', '92%'],
+                ['Rural School A', '6B', '30', '29', '1', '97%'],
+                ['Rural School B', '4A', '28', '26', '2', '93%'],
+                ['Rural School C', '5C', '22', '18', '4', '82%']
+            ];
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            reportData.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'admin_attendance_report.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Attendance report exported successfully!');
+        }
+
+        // Sync Functions
+        function uploadAllData() {
+            const uploadBtn = document.querySelector('#sync .btn-warning');
+            const originalText = uploadBtn.innerHTML;
+            
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadBtn.disabled = true;
+            
+            setTimeout(() => {
+                uploadBtn.innerHTML = '<i class="fas fa-check"></i> Upload Complete';
+                uploadBtn.style.backgroundColor = '#2ecc71';
+                
+                setTimeout(() => {
+                    uploadBtn.innerHTML = originalText;
+                    uploadBtn.disabled = false;
+                    uploadBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                alert('All data uploaded successfully!');
+            }, 3000);
+        }
+
+        function createBackup() {
+            const backupBtn = document.querySelector('#sync .btn:not(.btn-warning)');
+            const originalText = backupBtn.innerHTML;
+            
+            backupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Backup...';
+            backupBtn.disabled = true;
+            
+            setTimeout(() => {
+                backupBtn.innerHTML = '<i class="fas fa-check"></i> Backup Created';
+                backupBtn.style.backgroundColor = '#2ecc71';
+                
+                setTimeout(() => {
+                    backupBtn.innerHTML = originalText;
+                    backupBtn.disabled = false;
+                    backupBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                alert('Database backup created successfully!');
+            }, 2500);
+        }
+
+        // Add event listeners for export and sync buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Export Report button
+            const exportBtn = document.querySelector('#attendance .btn');
+            if (exportBtn && exportBtn.textContent.includes('Export')) {
+                exportBtn.addEventListener('click', exportAttendanceReport);
+            }
+
+            // Upload Data button
+            const uploadBtn = document.querySelector('#sync .btn-warning');
+            if (uploadBtn) {
+                uploadBtn.addEventListener('click', uploadAllData);
+            }
+
+            // Create Backup button
+            const backupBtn = document.querySelector('#sync .btn:not(.btn-warning)');
+            if (backupBtn && backupBtn.textContent.includes('Backup')) {
+                backupBtn.addEventListener('click', createBackup);
+            }
+        });
+
+        // Initialize the app
+        populateAllTables();
+    </script>
+</body>
+</html>

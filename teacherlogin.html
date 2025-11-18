@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoAttend - Teacher Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header i {
+            font-size: 1.8rem;
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-present {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-absent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Attendance Page Styles */
+        .attendance-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .camera-preview {
+            background-color: #2c3e50;
+            border-radius: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-direction: column;
+        }
+
+        .camera-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .attendance-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            position: relative;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: 15px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-header i {
+            font-size: 3.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .login-header h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            transform: translateX(-3px);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        /* Hidden sections */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .attendance-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-header h2, .menu-item span {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+        }
+
+        /* Action buttons in tables */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+        }
+
+        .delete-btn {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-school"></i>
+                <h2>AutoAttend</h2>
+                <p>Teacher Login</p>
+            </div>
+            <button class="back-btn" onclick="window.location.href='home.html'" title="Back to Home">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user" style="margin-right: 8px;"></i>Username
+                    </label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="class">
+                        <i class="fas fa-chalkboard" style="margin-right: 8px;"></i>Class
+                    </label>
+                    <input type="text" id="class" class="form-control" placeholder="Enter your class (e.g., 5A)" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock" style="margin-right: 8px;"></i>Password
+                    </label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 600;">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>Login to Dashboard
+                    </button>
+                </div>
+                <div class="form-group" style="text-align: center;">
+                    <a href="#" style="color: var(--secondary); text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-question-circle" style="margin-right: 5px;"></i>Forgot Password?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App (Hidden until login) -->
+    <div id="app" class="container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-school"></i>
+                <h2>AutoAttend</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-page="attendance">
+                    <i class="fas fa-user-check"></i>
+                    <span>Take Attendance</span>
+                </div>
+                <div class="menu-item" data-page="students">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Students</span>
+                </div>
+                <div class="menu-item" data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports & Analytics</span>
+                </div>
+                <div class="menu-item" data-page="sync">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Sync Data</span>
+                </div>
+                <div class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="menu-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="current-date">Loading date...</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">TS</div>
+                    <div>
+                        <div>Teacher Smith</div>
+                        <small>Class 5A</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page-section active">
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h3>Take Attendance</h3>
+                        <p>Mark today's attendance using face recognition, QR code, or RFID.</p>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-success start-attendance" data-method="face">
+                                <i class="fas fa-camera"></i> Face Recognition
+                            </button>
+                            <button class="btn btn-outline start-attendance" data-method="qr" style="margin-top: 0.5rem;">
+                                <i class="fas fa-qrcode"></i> Scan QR Code
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Manage Students</h3>
+                        <p>View, add, or edit student information for your class.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="students">
+                            <i class="fas fa-user-edit"></i> Manage Students
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>View Reports</h3>
+                        <p>Check attendance summaries and analytics for your class.</p>
+                        <button class="btn" style="margin-top: 1rem;" data-page="reports">
+                            <i class="fas fa-chart-line"></i> View Reports
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3>Sync Data</h3>
+                        <p>Sync attendance data with the server or download updates.</p>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-warning">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Data
+                            </button>
+                            <button class="btn btn-outline" style="margin-top: 0.5rem;">
+                                <i class="fas fa-cloud-download-alt"></i> Download Updates
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Today's Quick Stats</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background-color: rgba(46, 204, 113, 0.1); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--success);">18</div>
+                            <div>Present Today</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background-color: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">2</div>
+                            <div>Absent Today</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background-color: rgba(52, 152, 219, 0.1); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--secondary);">92%</div>
+                            <div>Attendance Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Page -->
+            <div id="attendance" class="page-section">
+                <div class="attendance-container">
+                    <div class="camera-preview">
+                        <div class="camera-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3>Face Recognition Active</h3>
+                        <p>Position students in front of the camera</p>
+                        <div style="margin-top: 1.5rem;">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-stop"></i> Stop Attendance
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="table-container">
+                            <div class="table-header">
+                                <h3>Today's Attendance</h3>
+                                <span class="badge badge-primary">Live</span>
+                            </div>
+                            <div class="attendance-list">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendance-list-body">
+                                        <!-- Attendance data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                            <button class="btn btn-success">
+                                <i class="fas fa-save"></i> Save Attendance
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-print"></i> Print Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Management Page -->
+            <div id="students" class="page-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Student Management</h3>
+                        <button class="btn" id="add-student-btn">
+                            <i class="fas fa-plus"></i> Add Student
+                        </button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Last Attendance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list-body">
+                            <!-- Students data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add Student Modal (simplified as inline form for this example) -->
+                <div id="add-student-form" class="card" style="margin-top: 2rem; display: none;">
+                    <h3>Add New Student</h3>
+                    <form id="student-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label" for="student-id">Student ID</label>
+                                <input type="text" id="student-id" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="student-name">Full Name</label>
+                                <input type="text" id="student-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="student-class">Class</label>
+                                <select id="student-class" class="form-control" required>
+                                    <option value="">Select Class</option>
+                                    <option value="5A">Class 5A</option>
+                                    <option value="5B">Class 5B</option>
+                                    <option value="6A">Class 6A</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="student-section">Section</label>
+                                <input type="text" id="student-section" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Upload Photo</label>
+                            <input type="file" id="student-photo" class="form-control" accept="image/*">
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Save Student
+                            </button>
+                            <button type="button" class="btn btn-outline" id="cancel-add-student">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports" class="page-section">
+                <div class="card">
+                    <h3>Attendance Reports</h3>
+                    <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+                        <select class="form-control" style="width: auto;">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>This month</option>
+                            <option>Custom range</option>
+                        </select>
+                        <button class="btn">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3>Attendance Trend</h3>
+                        <div style="height: 300px; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            [Attendance Chart Would Appear Here]
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Summary</h3>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Total Students</span>
+                                <strong>25</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Average Attendance</span>
+                                <strong>92%</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0;">
+                                <span>Days with >90%</span>
+                                <strong>18/20</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.8rem 0;">
+                                <span>Most Absent Student</span>
+                                <strong>Rahul (4 days)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>Detailed Report</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mon, 15 Nov 2023</td>
+                                <td>23</td>
+                                <td>2</td>
+                                <td>92%</td>
+                            </tr>
+                            <tr>
+                                <td>Fri, 12 Nov 2023</td>
+                                <td>24</td>
+                                <td>1</td>
+                                <td>96%</td>
+                            </tr>
+                            <tr>
+                                <td>Thu, 11 Nov 2023</td>
+                                <td>22</td>
+                                <td>3</td>
+                                <td>88%</td>
+                            </tr>
+                            <!-- More rows would be here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sync Page -->
+            <div id="sync" class="page-section">
+                <div class="card">
+                    <h3>Data Synchronization</h3>
+                    <p>Sync your attendance data with the central server or download updates.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Upload Data</h3>
+                            <p>Send your local attendance records to the server.</p>
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                    <span style="flex: 1;">Pending records:</span>
+                                    <span class="badge badge-warning">15</span>
+                                </div>
+                                <button class="btn btn-warning" style="width: 100%;">
+                                    <i class="fas fa-upload"></i> Upload Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </div>
+                            <h3>Download Updates</h3>
+                            <p>Get the latest student data and system updates.</p>
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                    <span style="flex: 1;">Last sync:</span>
+                                    <span>2 days ago</span>
+                                </div>
+                                <button class="btn" style="width: 100%;">
+                                    <i class="fas fa-download"></i> Download Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3>Sync History</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Records</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15 Nov 2023, 10:30 AM</td>
+                                    <td>Upload</td>
+                                    <td>12 records</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14 Nov 2023, 4:15 PM</td>
+                                    <td>Download</td>
+                                    <td>3 updates</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>13 Nov 2023, 9:45 AM</td>
+                                    <td>Upload</td>
+                                    <td>8 records</td>
+                                    <td><span class="badge badge-success">Success</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page-section">
+                <div class="card">
+                    <h3>Application Settings</h3>
+                    
+                    <div style="display: grid; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Default Class</label>
+                            <select class="form-control">
+                                <option>Class 5A</option>
+                                <option>Class 5B</option>
+                                <option>Class 6A</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Attendance Method</label>
+                            <select class="form-control">
+                                <option>Face Recognition</option>
+                                <option>QR Code</option>
+                                <option>RFID</option>
+                                <option>Manual</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Offline Mode</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Work without internet connection</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Auto-sync</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Automatically sync when online</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 500;">Attendance Notifications</div>
+                                <div style="font-size: 0.9rem; color: #6c757d;">Get alerts for absent students</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-undo"></i> Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for demonstration
+        const sampleStudents = [
+            { id: 'S001', name: 'Rahul Sharma', class: '5A', lastAttendance: '15 Nov 2023', status: 'present' },
+            { id: 'S002', name: 'Priya Patel', class: '5A', lastAttendance: '15 Nov 2023', status: 'present' },
+            { id: 'S003', name: 'Amit Kumar', class: '5A', lastAttendance: '15 Nov 2023', status: 'absent' },
+            { id: 'S004', name: 'Sneha Singh', class: '5A', lastAttendance: '15 Nov 2023', status: 'present' },
+            { id: 'S005', name: 'Vikram Joshi', class: '5A', lastAttendance: '15 Nov 2023', status: 'present' }
+        ];
+
+        const sampleAttendance = [
+            { id: 'S001', name: 'Rahul Sharma', status: 'present', time: '08:15 AM' },
+            { id: 'S002', name: 'Priya Patel', status: 'present', time: '08:16 AM' },
+            { id: 'S004', name: 'Sneha Singh', status: 'present', time: '08:17 AM' },
+            { id: 'S005', name: 'Vikram Joshi', status: 'present', time: '08:18 AM' }
+        ];
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const app = document.getElementById('app');
+        const loginForm = document.getElementById('login-form');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const pageSections = document.querySelectorAll('.page-section');
+        const pageTitle = document.getElementById('page-title');
+        const currentDate = document.getElementById('current-date');
+        const studentsListBody = document.getElementById('students-list-body');
+        const attendanceListBody = document.getElementById('attendance-list-body');
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const addStudentForm = document.getElementById('add-student-form');
+        const studentForm = document.getElementById('student-form');
+        const cancelAddStudent = document.getElementById('cancel-add-student');
+        const startAttendanceBtns = document.querySelectorAll('.start-attendance');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Set current date
+        const now = new Date();
+        currentDate.textContent = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Login functionality
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const classValue = document.getElementById('class').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation - in real app, this would be an API call
+            if (username && classValue && password) {
+                // Update user display
+                const userAvatar = document.querySelector('.user-avatar');
+                const userInfo = document.querySelector('.user-info div');
+                
+                userAvatar.textContent = username.substring(0, 2).toUpperCase();
+                userInfo.innerHTML = `<div>${username}</div><small>Class ${classValue}</small>`;
+                
+                loginPage.style.display = 'none';
+                app.style.display = 'flex';
+                populateStudentsTable();
+                populateAttendanceTable();
+            } else {
+                alert('Please enter username, class, and password');
+            }
+        });
+
+        // Navigation
+        menuItems.forEach(item => {
+            if (item.id !== 'logout-btn') {
+                item.addEventListener('click', function() {
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Update active menu item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target page
+                    pageSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(targetPage).classList.add('active');
+                    
+                    // Update page title
+                    pageTitle.textContent = getPageTitle(targetPage);
+                });
+            }
+        });
+
+        // Button navigation
+        document.querySelectorAll('button[data-page]').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetPage = this.getAttribute('data-page');
+                
+                // Update active menu item
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector(`.menu-item[data-page="${targetPage}"]`).classList.add('active');
+                
+                // Show target page
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById(targetPage).classList.add('active');
+                
+                // Update page title
+                pageTitle.textContent = getPageTitle(targetPage);
+            });
+        });
+
+        // Make all dashboard buttons functional
+        document.addEventListener('DOMContentLoaded', function() {
+            // Face Recognition button with actual camera access
+            const faceRecognitionBtn = document.querySelector('.btn-success[data-method="face"]');
+            if (faceRecognitionBtn) {
+                faceRecognitionBtn.addEventListener('click', function() {
+                    startFaceRecognition();
+                });
+            }
+
+            // Scan QR Code button
+            const qrCodeBtn = document.querySelector('.btn-outline[data-method="qr"]');
+            if (qrCodeBtn) {
+                qrCodeBtn.addEventListener('click', function() {
+                    navigateToPage('attendance');
+                });
+            }
+
+            // Manage Students button
+            const manageStudentsBtn = document.querySelector('button[data-page="students"]');
+            if (manageStudentsBtn) {
+                manageStudentsBtn.addEventListener('click', function() {
+                    navigateToPage('students');
+                });
+            }
+
+            // View Reports button
+            const viewReportsBtn = document.querySelector('button[data-page="reports"]');
+            if (viewReportsBtn) {
+                viewReportsBtn.addEventListener('click', function() {
+                    navigateToPage('reports');
+                });
+            }
+
+            // Upload Data button in sync section
+            const uploadDataBtn = document.querySelector('#sync .btn-warning');
+            if (uploadDataBtn && uploadDataBtn.textContent.includes('Upload')) {
+                uploadDataBtn.addEventListener('click', function() {
+                    uploadAttendanceData();
+                });
+            }
+
+            // Download Updates button in sync section
+            const downloadBtn = document.querySelector('#sync .btn');
+            if (downloadBtn && downloadBtn.textContent.includes('Download')) {
+                downloadBtn.addEventListener('click', function() {
+                    downloadUpdates();
+                });
+            }
+
+            // Export Report button
+            const exportReportBtn = document.querySelector('#reports .btn');
+            if (exportReportBtn && exportReportBtn.textContent.includes('Export')) {
+                exportReportBtn.addEventListener('click', function() {
+                    exportAttendanceReport();
+                });
+            }
+        });
+
+        // Helper function to navigate to pages
+        function navigateToPage(targetPage) {
+            // Update active menu item
+            menuItems.forEach(i => i.classList.remove('active'));
+            const targetMenuItem = document.querySelector(`.menu-item[data-page="${targetPage}"]`);
+            if (targetMenuItem) {
+                targetMenuItem.classList.add('active');
+            }
+            
+            // Show target page
+            pageSections.forEach(section => section.classList.remove('active'));
+            const targetSection = document.getElementById(targetPage);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update page title
+            pageTitle.textContent = getPageTitle(targetPage);
+        }
+
+        // Start attendance
+        startAttendanceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const method = this.getAttribute('data-method');
+                
+                // Update active menu item
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector('.menu-item[data-page="attendance"]').classList.add('active');
+                
+                // Show attendance page
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById('attendance').classList.add('active');
+                
+                // Update page title
+                pageTitle.textContent = 'Take Attendance';
+                
+                // Show method in UI
+                const cameraIcon = document.querySelector('.camera-icon i');
+                const cameraTitle = document.querySelector('.camera-preview h3');
+                
+                if (method === 'face') {
+                    cameraIcon.className = 'fas fa-camera';
+                    cameraTitle.textContent = 'Face Recognition Active';
+                } else if (method === 'qr') {
+                    cameraIcon.className = 'fas fa-qrcode';
+                    cameraTitle.textContent = 'QR Code Scanner Active';
+                }
+            });
+        });
+
+        // Student management
+        addStudentBtn.addEventListener('click', function() {
+            addStudentForm.style.display = 'block';
+        });
+
+        cancelAddStudent.addEventListener('click', function() {
+            addStudentForm.style.display = 'none';
+            studentForm.reset();
+        });
+
+        studentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real app, this would send data to the server
+            alert('Student added successfully!');
+            addStudentForm.style.display = 'none';
+            studentForm.reset();
+            populateStudentsTable();
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                app.style.display = 'none';
+                loginPage.style.display = 'flex';
+                loginForm.reset();
+            }
+        });
+
+        // Helper functions
+        function getPageTitle(page) {
+            const titles = {
+                'dashboard': 'Dashboard',
+                'attendance': 'Take Attendance',
+                'students': 'Manage Students',
+                'reports': 'Reports & Analytics',
+                'sync': 'Sync Data',
+                'settings': 'Settings'
+            };
+            return titles[page] || 'AutoAttend';
+        }
+
+        function populateStudentsTable() {
+            studentsListBody.innerHTML = '';
+            sampleStudents.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.class}</td>
+                    <td>${student.lastAttendance}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editStudent('${student.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteStudent('${student.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                studentsListBody.appendChild(row);
+            });
+        }
+
+        function populateAttendanceTable() {
+            attendanceListBody.innerHTML = '';
+            sampleAttendance.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.name}</td>
+                    <td class="status-${record.status}">${record.status.charAt(0).toUpperCase() + record.status.slice(1)}</td>
+                    <td>${record.time}</td>
+                `;
+                attendanceListBody.appendChild(row);
+            });
+        }
+
+        // Face Recognition Functions
+        async function startFaceRecognition() {
+            try {
+                navigateToPage('attendance');
+                
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                
+                // Create video element for camera preview
+                const cameraPreview = document.querySelector('.camera-preview');
+                cameraPreview.innerHTML = `
+                    <video id="camera-video" autoplay style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></video>
+                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+                        <button class="btn btn-danger" onclick="stopFaceRecognition()">
+                            <i class="fas fa-stop"></i> Stop Recognition
+                        </button>
+                    </div>
+                `;
+                
+                const video = document.getElementById('camera-video');
+                video.srcObject = stream;
+                
+                // Simulate face recognition detection
+                setTimeout(() => {
+                    simulateStudentDetection();
+                }, 3000);
+                
+            } catch (error) {
+                alert('Camera access denied or not available. Please check your camera permissions.');
+                console.error('Camera error:', error);
+            }
+        }
+
+        function stopFaceRecognition() {
+            const video = document.getElementById('camera-video');
+            if (video && video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
+            // Reset camera preview
+            const cameraPreview = document.querySelector('.camera-preview');
+            cameraPreview.innerHTML = `
+                <div class="camera-icon">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3>Face Recognition Stopped</h3>
+                <p>Click start to begin attendance</p>
+                <div style="margin-top: 1.5rem;">
+                    <button class="btn btn-success" onclick="startFaceRecognition()">
+                        <i class="fas fa-play"></i> Start Recognition
+                    </button>
+                </div>
+            `;
+        }
+
+        function simulateStudentDetection() {
+            // Simulate detecting students and marking attendance
+            const detectedStudents = [
+                { id: 'S001', name: 'Rahul Sharma', confidence: 95 },
+                { id: 'S002', name: 'Priya Patel', confidence: 98 },
+                { id: 'S004', name: 'Sneha Singh', confidence: 92 }
+            ];
+            
+            detectedStudents.forEach((student, index) => {
+                setTimeout(() => {
+                    addAttendanceRecord(student.id, student.name, 'present', new Date().toLocaleTimeString());
+                    showDetectionAlert(student.name, student.confidence);
+                }, index * 2000);
+            });
+        }
+
+        function addAttendanceRecord(id, name, status, time) {
+            const tbody = document.getElementById('attendance-list-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${id}</td>
+                <td>${name}</td>
+                <td class="status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+                <td>${time}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function showDetectionAlert(name, confidence) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #2ecc71;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            `;
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> 
+                ${name} detected (${confidence}% confidence)
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 3000);
+        }
+
+        // Student Management Functions
+        function editStudent(studentId) {
+            const student = sampleStudents.find(s => s.id === studentId);
+            if (student) {
+                const newName = prompt('Edit student name:', student.name);
+                if (newName && newName.trim()) {
+                    student.name = newName.trim();
+                    populateStudentsTable();
+                    alert('Student updated successfully!');
+                }
+            }
+        }
+
+        function deleteStudent(studentId) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                const index = sampleStudents.findIndex(s => s.id === studentId);
+                if (index > -1) {
+                    sampleStudents.splice(index, 1);
+                    populateStudentsTable();
+                    alert('Student deleted successfully!');
+                }
+            }
+        }
+
+        // Export Report Function
+        function exportAttendanceReport() {
+            const reportData = [
+                ['Date', 'Present', 'Absent', 'Attendance %'],
+                ['Mon, 15 Nov 2023', '23', '2', '92%'],
+                ['Fri, 12 Nov 2023', '24', '1', '96%'],
+                ['Thu, 11 Nov 2023', '22', '3', '88%']
+            ];
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            reportData.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'attendance_report.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Attendance report exported successfully!');
+        }
+
+        // Sync Data Functions
+        function uploadAttendanceData() {
+            const uploadBtn = document.querySelector('#sync .btn-warning');
+            const originalText = uploadBtn.innerHTML;
+            
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadBtn.disabled = true;
+            
+            // Simulate upload process
+            setTimeout(() => {
+                uploadBtn.innerHTML = '<i class="fas fa-check"></i> Upload Complete';
+                uploadBtn.style.backgroundColor = '#2ecc71';
+                
+                // Update pending records count
+                const pendingBadge = document.querySelector('#sync .badge-warning');
+                if (pendingBadge) {
+                    pendingBadge.textContent = '0';
+                    pendingBadge.className = 'badge badge-success';
+                }
+                
+                setTimeout(() => {
+                    uploadBtn.innerHTML = originalText;
+                    uploadBtn.disabled = false;
+                    uploadBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                alert('Attendance data uploaded successfully!');
+            }, 3000);
+        }
+
+        function downloadUpdates() {
+            const downloadBtn = document.querySelector('#sync .btn:not(.btn-warning)');
+            const originalText = downloadBtn.innerHTML;
+            
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+            downloadBtn.disabled = true;
+            
+            // Simulate download process
+            setTimeout(() => {
+                downloadBtn.innerHTML = '<i class="fas fa-check"></i> Download Complete';
+                downloadBtn.style.backgroundColor = '#2ecc71';
+                
+                // Update last sync time
+                const lastSyncSpan = document.querySelector('#sync span:contains("2 days ago")');
+                if (lastSyncSpan) {
+                    lastSyncSpan.textContent = 'Just now';
+                }
+                
+                setTimeout(() => {
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                    downloadBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                alert('Updates downloaded successfully!');
+            }, 2500);
+        }
+
+        // Initialize the app
+        populateStudentsTable();
+        populateAttendanceTable();
+    </script>
+</body>
+</html>
